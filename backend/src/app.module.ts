@@ -23,7 +23,7 @@ import { envValidationSchema } from './config/env.validation';
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_NAME'),
         entities: [User],
-        synchronize: true,
+        synchronize: false,
         logging: config.get('NODE_ENV') === 'development',
       }),
     }),
