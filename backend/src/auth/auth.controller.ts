@@ -7,6 +7,7 @@ import {
   HttpCode,
   Res,
   Get,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -26,8 +27,9 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const tokens = await this.authService.register(dto.email, dto.password);
+    this.setAccessCookie(res, tokens.accessToken);
     this.setRefreshCookie(res, tokens.refreshToken);
-    return { accessToken: tokens.accessToken };
+    return { message: 'Registered successfully' };
   }
 
   @Post('login')
@@ -37,18 +39,21 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const tokens = await this.authService.login(dto.email, dto.password);
+    this.setAccessCookie(res, tokens.accessToken);
     this.setRefreshCookie(res, tokens.refreshToken);
-    return { accessToken: tokens.accessToken };
+    return { message: 'Logged in successfully' };
   }
 
   @Post('refresh')
   @HttpCode(200)
   async refresh(@Request() req, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies?.refreshToken;
-    const userId = req.body?.userId;
-    const tokens = await this.authService.refreshTokens(userId, refreshToken);
+    if (!refreshToken) throw new UnauthorizedException('No refresh token');
+
+    const tokens = await this.authService.refreshTokens(refreshToken);
+    this.setAccessCookie(res, tokens.accessToken);
     this.setRefreshCookie(res, tokens.refreshToken);
-    return { accessToken: tokens.accessToken };
+    return { message: 'Token refreshed' };
   }
 
   @Post('logout')
@@ -56,15 +61,26 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @HttpCode(200)
   logout(@Request() req, @Res({ passthrough: true }) res: Response) {
+    res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
     return this.authService.logout(req.user.userId);
   }
 
-  @Post('me')
+  @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   getMe(@Request() req) {
     return this.authService.getMe(req.user.userId);
+  }
+
+  private setAccessCookie(res: Response, token: string) {
+    res.cookie('accessToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000,
+      path: '/',
+    });
   }
 
   private setRefreshCookie(res: Response, token: string) {
@@ -72,7 +88,7 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
     });
   }

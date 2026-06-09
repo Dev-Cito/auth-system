@@ -35,7 +35,11 @@ export class AuthService {
     return this.generateTokens(user.id, user.email);
   }
 
-  async refreshTokens(userId: string, refreshToken: string) {
+  async refreshTokens(refreshToken: string) {
+    const payload = this.jwtService.decode(refreshToken) as { sub?: string } | null;
+    const userId = payload?.sub;
+    if (!userId) throw new UnauthorizedException();
+
     const user = await this.usersService.findById(userId);
     if (!user?.refreshToken) throw new UnauthorizedException();
 
@@ -74,4 +78,5 @@ export class AuthService {
 
     return { accessToken, refreshToken };
   }
+
 }
