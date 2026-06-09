@@ -139,6 +139,6 @@ Full docs at `/api/docs` (Swagger UI).
 | Service | Platform |
 |---|---|
 | Frontend | [Vercel](https://vercel.com) |
-| Backend + DB | [Railway](https://railway.app) |
+| Backend + DB | [Render](https://render.com) |
 
-Set `NEXT_PUBLIC_API_URL=https://your-backend.railway.app/api` on Vercel.
+Set `NEXT_PUBLIC_API_URL=https://your-backend.onrender.com/api` on Vercel.
