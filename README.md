@@ -65,11 +65,11 @@ cp backend/.env.example backend/.env
 Fill in `backend/.env`:
 
 ```env
-DB_HOST=localhost
+DB_HOST=
 DB_PORT=5433
-DB_USERNAME=devuser
-DB_PASSWORD=devpassword
-DB_NAME=auth_db
+DB_USERNAME=
+DB_PASSWORD=
+DB_NAME=
 
 JWT_SECRET=your_jwt_secret
 JWT_EXPIRES_IN=15m
