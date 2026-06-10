@@ -16,4 +16,5 @@ export default new DataSource({
   database: configService.get('DB_NAME'),
   entities: [User],
   migrations: ['src/migrations/*.ts'],
+  ssl: { rejectUnauthorized: false },
 });

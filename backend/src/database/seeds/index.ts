@@ -17,6 +17,9 @@ const AppDataSource = new DataSource({
   database: configService.get('DB_NAME'),
   entities: [User],
   synchronize: false,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 const seeds = [
