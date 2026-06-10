@@ -18,7 +18,7 @@ A full-stack authentication system built with **NestJS** + **Next.js**, featurin
 
 ## 🖥️ Live Demo
 
-> Coming soon — deploy on Vercel + Railway
+> [https://auth-system-sand-omega.vercel.app](https://auth-system-sand-omega.vercel.app)
 
 **Test credentials**
 
