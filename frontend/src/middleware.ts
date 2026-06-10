@@ -1,21 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const PUBLIC_ROUTES = ['/login', '/register'];
-const PROTECTED_ROUTES = ['/dashboard'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get('accessToken')?.value
-    ?? request.headers.get('authorization')?.split(' ')[1];
-
+  
   const isPublic = PUBLIC_ROUTES.some((r) => pathname.startsWith(r));
-  const isProtected = PROTECTED_ROUTES.some((r) => pathname.startsWith(r));
 
-  if (isProtected && !token) {
+  // En prod, laisse passer — la protection se fait côté client
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.next();
+  }
+
+  const token = request.cookies.get('accessToken')?.value;
+
+  if (!token && !isPublic) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  if (isPublic && token) {
+  if (token && isPublic) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
