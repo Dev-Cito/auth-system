@@ -21,8 +21,24 @@ async function bootstrap() {
   );
 
   // CORS
+  // CORS
   app.enableCors({
-    origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        process.env.FRONTEND_URL ?? 'http://localhost:3000',
+        'http://localhost:3000',
+        'https://auth-system-sand-omega.vercel.app',
+      ];
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.vercel.app')
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   });
 
